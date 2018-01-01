@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Mojo::UserAgent;
+use Mojo::Template;
+
+
+my $ua = Mojo::UserAgent->new;
+$ua->max_redirects(3);
+$ua->transactor->name('Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36');
+
+my $base_url = "http://www.cimaglobal.com/Pages-that-we-will-need-to-bring-back/Old-site-pages1/Old-site-pages/Students/Find-an-employer-who-trains-their-staff-with-CIMA/";
+
+my $mt = Mojo::Template->new;
+
+my $reject = {};
+my $notes = {};
+
+my @results;
+for ('A' .. 'Z') {
+    my $get = $ua->get($base_url . $_);
+    # Scrape the company list
+    $get->res->dom->find('tr')->each( sub {
+        my $tr = shift;
+        my ($name, $country, $biz, $level) = $tr->find('td')->each;
+        return unless $level;
+
+        my $link = '';
+
+        if ($name->at('a')) {
+            $link = $name->at('a')->attr('href');
+            $name = $name->at('a')->text;
+        } else {
+            $name = $name->text;
+        }
+        chomp($name);
+        return unless $name;
+
+        $country = $country->text;
+        return unless ($country =~ m/UK/);
+
+        $biz = $biz->text;
+        $level = $level->text;
+
+        my $reject = ($reject->{$name}) || '';
+        my $notes = ($notes->{$name}) || '';
+
+        push(@results, {
+            name    => $name,
+            link    => $link,
+            country => $country,
+            biz     => $biz,
+            level   => $level,
+            reject  => $reject,
+            notes   => $notes,
+        });
+
+    });
+}
+
+
+open(my $fh, '>', 'public/index.html');
+print $fh $mt->vars(1)->render_file('./template.mt', {companies => \@results});
+close($fh);
