@@ -18,7 +18,12 @@
 <body>
 <div class="container-fluid">
 
-<h1>All UK Companies</h1>
+<h1>CIMA Training Employers</h1>
+
+<p class="lead">
+Find an employer who trains their staff with CIMA. This list is pulled from cimaglobal.com,
+but is a little easier to search around.
+</p>
 
 <div class="row">
 	<div class="col-md-12">
