@@ -1,0 +1,10 @@
+# CIMA Company Finder
+
+A quick tool to produce a full list of employers who trains their staff with
+CIMA. The main site splits them down on different pages, A to Z, which makes
+searching awkward.
+
+You can view the list at cima.falkus.co, or run the generate script yourself.
+
+You'll need `perl-Mojolicious`, then just `perl generate` will output for you
+to `public/index.html`.
